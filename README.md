@@ -23,7 +23,7 @@ This is the same type of technology used in self-driving cars, security systems,
 
 ---
 
-## The Five Demos
+## The Six Demos
 
 ### 1. Object Detector
 
@@ -77,9 +77,36 @@ This is the same type of technology used in self-driving cars, security systems,
 
 **Try this:**
 1. Draw a zone by clicking to place points, then click "Finish Zone"
-2. Enter "person" in the detection field
+2. Enter "face" in the detection field
 3. Start monitoring and move in/out of your drawn zone
 4. Watch the alert status change!
+
+---
+
+### 6. Production Monitor
+
+**What it does:** A comprehensive video production quality dashboard that combines traditional computer vision with MoonDream's visual reasoning. It monitors 7 different aspects of your shot in real-time:
+
+| Monitor | Source | What It Checks |
+|---------|--------|----------------|
+| Orientation | MediaPipe | Is the subject facing the camera? |
+| Talking | MediaPipe | Is the subject speaking? |
+| Focus | OpenCV | Is the image sharp or blurry? |
+| Lighting | Canvas | Is the scene properly exposed? |
+| Presence | MoonDream | Is a face detected in frame? |
+| Composition | MoonDream | Is the subject well-framed and positioned? |
+| Scene Context | MoonDream | AI description of what's happening |
+
+**Why it's useful:** This is the kind of automated quality control that broadcast engineers dream of. Instead of manually checking that a speaker is in frame, facing the camera, properly lit, and in focus—the AI monitors everything continuously and alerts you to problems.
+
+**Try this:**
+1. Start your webcam and click "Start Monitoring"
+2. Watch the status cards turn green (good), yellow (warning), or red (problem)
+3. Move around, look away from camera, or cover the lens to see how each monitor responds
+4. Click any card to enable/disable that specific monitor
+5. Read the Scene Description to see the AI's understanding of your shot
+
+**The hybrid approach:** This demo showcases how traditional computer vision (MediaPipe for face landmarks, OpenCV for focus detection) can work alongside visual reasoning (MoonDream for presence, composition, and scene understanding). Fast client-side analysis handles real-time metrics, while MoonDream adds contextual intelligence.
 
 ---
 
