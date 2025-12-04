@@ -1,0 +1,1841 @@
+/**
+ * MoonDream x PTZOptics AI Demo Suite
+ * PTZOptics Brand Theme
+ * https://ptzoptics.com/
+ */
+
+/* ============================================================
+   CSS CUSTOM PROPERTIES - PTZOptics Brand Colors
+   ============================================================ */
+:root {
+    /* PTZOptics Brand Colors */
+    --ptz-navy: #1a2b4a;
+    --ptz-navy-dark: #0f1a2e;
+    --ptz-navy-light: #2a3f5f;
+    --ptz-blue: #0066cc;
+    --ptz-blue-hover: #0052a3;
+    --ptz-blue-light: rgba(0, 102, 204, 0.15);
+    --ptz-accent: #00a0e3;
+    --ptz-white: #ffffff;
+    --ptz-gray-100: #f7f8fa;
+    --ptz-gray-200: #e8eaed;
+    --ptz-gray-300: #d1d5db;
+    --ptz-gray-500: #6b7280;
+    --ptz-gray-700: #374151;
+
+    /* Map to component variables */
+    --moon-primary: var(--ptz-blue);
+    --moon-primary-hover: var(--ptz-blue-hover);
+    --moon-primary-light: var(--ptz-blue-light);
+    --moon-secondary: var(--ptz-accent);
+
+    --moon-bg: var(--ptz-navy-dark);
+    --moon-bg-secondary: var(--ptz-navy);
+    --moon-bg-tertiary: var(--ptz-navy-light);
+
+    --moon-text: var(--ptz-white);
+    --moon-text-secondary: var(--ptz-gray-300);
+    --moon-text-muted: var(--ptz-gray-500);
+
+    --moon-border: rgba(255, 255, 255, 0.1);
+    --moon-border-light: rgba(255, 255, 255, 0.2);
+
+    --moon-success: #22c55e;
+    --moon-success-bg: rgba(34, 197, 94, 0.15);
+    --moon-warning: #f59e0b;
+    --moon-warning-bg: rgba(245, 158, 11, 0.15);
+    --moon-error: #ef4444;
+    --moon-error-bg: rgba(239, 68, 68, 0.15);
+    --moon-info: var(--ptz-accent);
+    --moon-info-bg: rgba(0, 160, 227, 0.15);
+
+    --moon-radius: 6px;
+    --moon-radius-lg: 10px;
+    --moon-radius-sm: 4px;
+
+    --moon-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --moon-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+    --moon-space-xs: 4px;
+    --moon-space-sm: 8px;
+    --moon-space-md: 16px;
+    --moon-space-lg: 24px;
+    --moon-space-xl: 32px;
+
+    --moon-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --moon-font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+
+    --moon-transition: 150ms ease;
+    --moon-transition-slow: 300ms ease;
+
+    --moon-sidebar-width: 260px;
+    --moon-sidebar-collapsed: 60px;
+}
+
+/* Light Theme Option */
+.moon-theme-light {
+    --moon-bg: var(--ptz-gray-100);
+    --moon-bg-secondary: var(--ptz-white);
+    --moon-bg-tertiary: var(--ptz-gray-200);
+    --moon-text: var(--ptz-navy-dark);
+    --moon-text-secondary: var(--ptz-gray-700);
+    --moon-text-muted: var(--ptz-gray-500);
+    --moon-border: var(--ptz-gray-200);
+    --moon-border-light: var(--ptz-gray-300);
+    --moon-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --moon-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================================
+   BASE RESET
+   ============================================================ */
+.moon-dashboard,
+.moon-dashboard *,
+.moon-widget,
+.moon-widget *,
+.moon-modal-overlay,
+.moon-modal-overlay * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ============================================================
+   DASHBOARD LAYOUT
+   ============================================================ */
+.moon-dashboard {
+    display: flex;
+    min-height: 100vh;
+    background: var(--moon-bg);
+    color: var(--moon-text);
+    font-family: var(--moon-font);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.moon-sidebar {
+    width: var(--moon-sidebar-width);
+    background: var(--moon-bg-secondary);
+    border-right: 1px solid var(--moon-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+}
+
+.moon-sidebar-title {
+    padding: var(--moon-space-lg);
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-sm);
+    border-bottom: 1px solid var(--moon-border);
+}
+
+.moon-logo { font-size: 24px; }
+
+.moon-nav {
+    list-style: none;
+    padding: var(--moon-space-md) 0;
+    flex: 1;
+}
+
+.moon-nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-md);
+    padding: var(--moon-space-md) var(--moon-space-lg);
+    cursor: pointer;
+    transition: background var(--moon-transition), color var(--moon-transition);
+    color: var(--moon-text-secondary);
+    border-left: 3px solid transparent;
+}
+
+.moon-nav-item:hover {
+    background: var(--moon-bg-tertiary);
+    color: var(--moon-text);
+}
+
+.moon-nav-item.moon-active {
+    background: var(--moon-primary-light);
+    color: var(--moon-primary);
+    border-left-color: var(--moon-primary);
+}
+
+.moon-nav-icon { font-size: 20px; width: 24px; text-align: center; }
+.moon-nav-label { font-weight: 500; }
+
+.moon-main {
+    flex: 1;
+    padding: var(--moon-space-xl);
+    overflow-y: auto;
+    background: var(--moon-bg);
+}
+
+/* ============================================================
+   API KEY STATUS (Sidebar)
+   ============================================================ */
+.moon-api-status {
+    padding: var(--moon-space-md) var(--moon-space-lg);
+    border-top: 1px solid var(--moon-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--moon-space-sm);
+}
+
+.moon-key-indicator {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-xs);
+}
+
+.moon-key-set { color: var(--moon-success); }
+.moon-key-missing { color: var(--moon-warning); }
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.moon-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: var(--moon-space-lg);
+}
+
+.moon-modal {
+    background: var(--moon-bg-secondary);
+    border-radius: var(--moon-radius-lg);
+    max-width: 480px;
+    width: 100%;
+    box-shadow: var(--moon-shadow-lg);
+    border: 1px solid var(--moon-border);
+    animation: moonModalIn 0.2s ease;
+}
+
+@keyframes moonModalIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.moon-modal-header {
+    padding: var(--moon-space-lg);
+    border-bottom: 1px solid var(--moon-border);
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-md);
+}
+
+.moon-modal-icon { font-size: 28px; }
+
+.moon-modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--moon-text);
+}
+
+.moon-modal-body {
+    padding: var(--moon-space-lg);
+    overflow: hidden;
+}
+
+/* API Key Input - ensure proper fit in modal */
+.moon-api-key-input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    word-break: break-all;
+}
+
+.moon-modal-desc {
+    color: var(--moon-text-secondary);
+    margin-bottom: var(--moon-space-lg);
+    line-height: 1.6;
+}
+
+.moon-form-group {
+    margin-bottom: var(--moon-space-md);
+    width: 100%;
+    overflow: hidden;
+}
+
+.moon-modal-help {
+    font-size: 13px;
+    color: var(--moon-text-muted);
+    margin-bottom: var(--moon-space-md);
+}
+
+.moon-modal-help a {
+    color: var(--moon-primary);
+    text-decoration: none;
+}
+
+.moon-modal-help a:hover {
+    text-decoration: underline;
+}
+
+.moon-modal-notice {
+    background: var(--moon-bg-tertiary);
+    padding: var(--moon-space-md);
+    border-radius: var(--moon-radius);
+    font-size: 12px;
+    color: var(--moon-text-muted);
+    line-height: 1.5;
+}
+
+.moon-modal-notice strong {
+    color: var(--moon-text-secondary);
+}
+
+.moon-modal-footer {
+    padding: var(--moon-space-lg);
+    border-top: 1px solid var(--moon-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--moon-space-sm);
+}
+
+/* Modal Steps */
+.moon-modal-steps {
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    padding: var(--moon-space-md);
+    margin-bottom: var(--moon-space-lg);
+}
+
+.moon-modal-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--moon-space-md);
+    padding: var(--moon-space-sm) 0;
+    color: var(--moon-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.moon-modal-step:not(:last-child) {
+    border-bottom: 1px solid var(--moon-border);
+    padding-bottom: var(--moon-space-md);
+    margin-bottom: var(--moon-space-sm);
+}
+
+.moon-modal-step a {
+    color: var(--moon-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.moon-modal-step a:hover {
+    text-decoration: underline;
+}
+
+.moon-step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--moon-primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* Input hints and errors */
+.moon-input-hint {
+    font-size: 12px;
+    color: var(--moon-text-muted);
+    margin-top: var(--moon-space-xs);
+}
+
+.moon-input-error-msg {
+    font-size: 13px;
+    color: var(--moon-error);
+    margin-top: var(--moon-space-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-xs);
+}
+
+.moon-input-error-msg::before {
+    content: '⚠';
+}
+
+/* Modal toggle */
+.moon-modal-toggle {
+    margin-top: var(--moon-space-sm);
+}
+
+.moon-modal-toggle label {
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-sm);
+    font-size: 13px;
+    color: var(--moon-text-muted);
+    cursor: pointer;
+}
+
+.moon-modal-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.moon-input-error {
+    border-color: var(--moon-error) !important;
+    animation: moonShake 0.3s ease;
+}
+
+@keyframes moonShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* ============================================================
+   WIDGET STRUCTURE
+   ============================================================ */
+.moon-widget { max-width: 1200px; margin: 0 auto; }
+.moon-widget-header { margin-bottom: var(--moon-space-xl); }
+.moon-widget-icon { font-size: 32px; display: block; margin-bottom: var(--moon-space-sm); }
+.moon-widget-title { font-size: 24px; font-weight: 700; color: var(--moon-text); margin-bottom: var(--moon-space-xs); }
+.moon-widget-desc { color: var(--moon-text-secondary); font-size: 15px; }
+.moon-widget-body { display: flex; flex-direction: column; gap: var(--moon-space-lg); }
+
+/* ============================================================
+   GRID SYSTEM
+   ============================================================ */
+.moon-grid { display: grid; gap: var(--moon-space-xl); }
+.moon-grid-2 { grid-template-columns: 1fr 1fr; }
+.moon-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--moon-space-lg);
+}
+
+/* Ensure proper spacing for child elements in columns */
+.moon-col > * {
+    margin: 0;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.moon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--moon-space-sm);
+    padding: var(--moon-space-sm) var(--moon-space-md);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    border: 1px solid transparent;
+    border-radius: var(--moon-radius);
+    cursor: pointer;
+    transition: all var(--moon-transition);
+    white-space: nowrap;
+}
+
+.moon-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.moon-btn-primary {
+    background: var(--moon-primary);
+    color: white;
+    border-color: var(--moon-primary);
+}
+
+.moon-btn-primary:hover:not(:disabled) {
+    background: var(--moon-primary-hover);
+    border-color: var(--moon-primary-hover);
+}
+
+.moon-btn-secondary {
+    background: transparent;
+    color: var(--moon-text);
+    border-color: var(--moon-border);
+}
+
+.moon-btn-secondary:hover:not(:disabled) {
+    background: var(--moon-bg-tertiary);
+    border-color: var(--moon-border-light);
+}
+
+.moon-btn-secondary.moon-btn-active {
+    background: var(--moon-primary-light);
+    color: var(--moon-primary);
+    border-color: var(--moon-primary);
+}
+
+.moon-btn-success {
+    background: var(--moon-success);
+    color: white;
+    border-color: var(--moon-success);
+}
+
+.moon-btn-success:hover:not(:disabled) {
+    background: #0d9668;
+    border-color: #0d9668;
+}
+
+.moon-btn-danger {
+    background: var(--moon-error);
+    color: white;
+    border-color: var(--moon-error);
+}
+
+.moon-btn-danger:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.moon-btn-lg { padding: var(--moon-space-md) var(--moon-space-lg); font-size: 16px; }
+.moon-btn-sm { padding: var(--moon-space-xs) var(--moon-space-sm); font-size: 12px; }
+.moon-btn-icon { padding: var(--moon-space-sm); min-width: 36px; }
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+.moon-input {
+    width: 100%;
+    padding: var(--moon-space-sm) var(--moon-space-md);
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--moon-bg-tertiary);
+    border: 1px solid var(--moon-border);
+    border-radius: var(--moon-radius);
+    color: var(--moon-text);
+    transition: border-color var(--moon-transition);
+    box-sizing: border-box;
+}
+
+.moon-input:focus { outline: none; border-color: var(--moon-primary); }
+.moon-input::placeholder { color: var(--moon-text-muted); }
+
+.moon-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--moon-text-secondary);
+    margin-bottom: var(--moon-space-xs);
+}
+
+/* ============================================================
+   INPUT GROUPS & FORM LAYOUT
+   ============================================================ */
+.moon-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--moon-space-sm);
+    margin-bottom: var(--moon-space-lg);
+}
+
+.moon-input-group .moon-label {
+    margin-bottom: 0;
+}
+
+.moon-input-row {
+    display: flex;
+    gap: var(--moon-space-sm);
+    align-items: center;
+}
+
+.moon-input-row .moon-input {
+    flex: 1;
+}
+
+/* ============================================================
+   QUICK BUTTONS / PRESET BUTTONS
+   ============================================================ */
+.moon-quick-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--moon-space-xs);
+    margin-top: var(--moon-space-sm);
+}
+
+.moon-btn-quick {
+    padding: var(--moon-space-xs) var(--moon-space-sm);
+    font-size: 12px;
+    background: var(--moon-bg-tertiary);
+    border: 1px solid var(--moon-border);
+    border-radius: var(--moon-radius-sm);
+    color: var(--moon-text-secondary);
+    cursor: pointer;
+    transition: all var(--moon-transition);
+}
+
+.moon-btn-quick:hover {
+    background: var(--moon-bg-secondary);
+    border-color: var(--moon-primary);
+    color: var(--moon-primary);
+}
+
+/* ============================================================
+   ACTIONS ROW
+   ============================================================ */
+.moon-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--moon-space-sm);
+    margin-bottom: var(--moon-space-lg);
+    padding: var(--moon-space-md);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+}
+
+.moon-btn-action {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* ============================================================
+   SECTIONS - Fixed heights to prevent layout shift
+   ============================================================ */
+.moon-section {
+    background: var(--moon-bg-secondary);
+    border-radius: var(--moon-radius-lg);
+    padding: var(--moon-space-lg);
+    border: 1px solid var(--moon-border);
+    margin-bottom: var(--moon-space-lg);
+}
+
+.moon-section:last-child {
+    margin-bottom: 0;
+}
+
+.moon-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--moon-text);
+    margin-bottom: var(--moon-space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-sm);
+}
+
+.moon-section .moon-btn {
+    margin-bottom: var(--moon-space-md);
+}
+
+.moon-section .moon-input {
+    margin-bottom: var(--moon-space-sm);
+}
+
+.moon-section .moon-quick-btns {
+    margin-bottom: var(--moon-space-md);
+}
+
+/* Caption result area - fixed minimum height */
+.moon-caption-result {
+    min-height: 80px;
+}
+
+/* Q&A result area - fixed minimum height */
+.moon-qa-result {
+    min-height: 120px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+/* ============================================================
+   VIDEO/MEDIA CONTAINER WITH OVERLAY SUPPORT
+   ============================================================ */
+.moon-video-container {
+    position: relative;
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius-lg);
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.moon-video,
+.moon-capture-canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+}
+
+.moon-video-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--moon-text-muted);
+    font-size: 15px;
+    text-align: center;
+    padding: var(--moon-space-lg);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--moon-bg-tertiary);
+}
+
+.moon-placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--moon-space-sm);
+}
+
+.moon-placeholder-icon {
+    font-size: 48px;
+    opacity: 0.6;
+}
+
+.moon-placeholder-text {
+    font-size: 16px;
+    color: var(--moon-text-secondary);
+}
+
+.moon-placeholder-hint {
+    font-size: 13px;
+    color: var(--moon-text-muted);
+    opacity: 0.8;
+}
+
+.moon-media-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--moon-space-sm);
+    margin-top: var(--moon-space-md);
+}
+
+.moon-file-input { display: none; }
+.moon-no-webcam { font-size: 12px; color: var(--moon-text-muted); padding: var(--moon-space-sm); }
+
+/* Canvas overlay for bounding boxes, points, zones */
+.moon-overlay-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.moon-overlay-canvas.moon-drawing {
+    pointer-events: auto;
+    cursor: crosshair;
+}
+
+.moon-bbox-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* ============================================================
+   COUNT DISPLAY (Smart Counter) - Fixed size to prevent shift
+   ============================================================ */
+.moon-count-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--moon-space-lg);
+    padding: var(--moon-space-xl);
+    background: var(--moon-bg-secondary);
+    border-radius: var(--moon-radius-lg);
+    border: 1px solid var(--moon-border);
+    min-height: 120px;
+}
+
+.moon-count-number {
+    font-size: 72px;
+    font-weight: 700;
+    color: var(--moon-primary);
+    line-height: 1;
+    min-width: 100px;
+    text-align: center;
+}
+
+.moon-count-label {
+    font-size: 18px;
+    color: var(--moon-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 120px;
+}
+
+.moon-count-small {
+    font-size: 48px;
+}
+
+/* ============================================================
+   DETECTION RESULTS LIST
+   ============================================================ */
+.moon-detection-list {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.moon-detection-item {
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-md);
+    padding: var(--moon-space-sm) var(--moon-space-md);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    margin-bottom: var(--moon-space-sm);
+    transition: background var(--moon-transition);
+}
+
+.moon-detection-item:hover {
+    background: var(--moon-bg-secondary);
+}
+
+.moon-detection-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.moon-detection-label {
+    flex: 1;
+    font-weight: 500;
+    color: var(--moon-text);
+}
+
+.moon-detection-confidence {
+    font-size: 12px;
+    color: var(--moon-text-muted);
+    font-family: var(--moon-font-mono);
+}
+
+.moon-detection-coords {
+    font-size: 11px;
+    color: var(--moon-text-muted);
+    font-family: var(--moon-font-mono);
+}
+
+/* ============================================================
+   ZONE MONITOR STYLES - Fixed heights to prevent shift
+   ============================================================ */
+.moon-zone-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--moon-space-sm);
+    padding: var(--moon-space-md);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    margin-bottom: var(--moon-space-md);
+}
+
+.moon-zone-list {
+    list-style: none;
+    padding: 0;
+    min-height: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.moon-alert-display {
+    min-height: 80px;
+}
+
+.moon-alerts {
+    min-height: 50px;
+}
+
+.moon-no-zones {
+    color: var(--moon-text-muted);
+    font-size: 14px;
+    text-align: center;
+    padding: var(--moon-space-lg);
+}
+
+.moon-zone-item {
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-md);
+    padding: var(--moon-space-md);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    margin-bottom: var(--moon-space-sm);
+    border-left: 4px solid var(--moon-border);
+    transition: all var(--moon-transition);
+}
+
+.moon-zone-item.moon-zone-alert {
+    border-left-color: var(--moon-error);
+    background: var(--moon-error-bg);
+    animation: moonPulse 1s ease infinite;
+}
+
+.moon-zone-item.moon-zone-clear {
+    border-left-color: var(--moon-success);
+}
+
+@keyframes moonPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.moon-zone-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--moon-text);
+}
+
+.moon-zone-status {
+    font-size: 12px;
+    padding: var(--moon-space-xs) var(--moon-space-sm);
+    border-radius: var(--moon-radius-sm);
+    font-weight: 500;
+}
+
+.moon-zone-status-alert {
+    background: var(--moon-error);
+    color: white;
+}
+
+.moon-zone-status-clear {
+    background: var(--moon-success);
+    color: white;
+}
+
+.moon-zone-delete {
+    padding: var(--moon-space-xs);
+    background: transparent;
+    border: none;
+    color: var(--moon-text-muted);
+    cursor: pointer;
+    font-size: 16px;
+    transition: color var(--moon-transition);
+}
+
+.moon-zone-delete:hover {
+    color: var(--moon-error);
+}
+
+/* ============================================================
+   QUICK ACTIONS / PRESETS
+   ============================================================ */
+.moon-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--moon-space-sm);
+    margin-bottom: var(--moon-space-md);
+}
+
+.moon-quick-btn {
+    padding: var(--moon-space-xs) var(--moon-space-md);
+    font-size: 13px;
+    background: var(--moon-bg-tertiary);
+    border: 1px solid var(--moon-border);
+    border-radius: 999px;
+    color: var(--moon-text-secondary);
+    cursor: pointer;
+    transition: all var(--moon-transition);
+}
+
+.moon-quick-btn:hover {
+    background: var(--moon-bg-secondary);
+    border-color: var(--moon-primary);
+    color: var(--moon-primary);
+}
+
+.moon-quick-btn.moon-active {
+    background: var(--moon-primary-light);
+    border-color: var(--moon-primary);
+    color: var(--moon-primary);
+}
+
+/* ============================================================
+   CONTINUOUS MODE INDICATOR
+   ============================================================ */
+.moon-continuous-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-sm);
+    padding: var(--moon-space-sm) var(--moon-space-md);
+    background: var(--moon-info-bg);
+    border: 1px solid var(--moon-info);
+    border-radius: var(--moon-radius);
+    font-size: 13px;
+    color: var(--moon-info);
+}
+
+.moon-continuous-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--moon-info);
+    border-radius: 50%;
+    animation: moonBlink 1s ease infinite;
+}
+
+@keyframes moonBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.moon-continuous-indicator.moon-active {
+    background: var(--moon-success-bg);
+    border-color: var(--moon-success);
+    color: var(--moon-success);
+}
+
+.moon-continuous-indicator.moon-active .moon-continuous-dot {
+    background: var(--moon-success);
+}
+
+/* ============================================================
+   RESULTS SECTION - Fixed height to prevent layout shift
+   ============================================================ */
+.moon-results {
+    background: var(--moon-bg-secondary);
+    border-radius: var(--moon-radius-lg);
+    padding: var(--moon-space-lg);
+    border: 1px solid var(--moon-border);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.moon-results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--moon-space-md);
+    padding-bottom: var(--moon-space-sm);
+    border-bottom: 1px solid var(--moon-border);
+    flex-shrink: 0;
+}
+
+.moon-results-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--moon-text);
+    margin: 0;
+}
+
+.moon-results-header .moon-count {
+    font-size: 13px;
+    color: var(--moon-text-muted);
+    background: var(--moon-bg-tertiary);
+    padding: var(--moon-space-xs) var(--moon-space-sm);
+    border-radius: var(--moon-radius-sm);
+}
+
+.moon-results-list {
+    height: 150px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.moon-result-item {
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-md);
+    padding: var(--moon-space-sm) var(--moon-space-md);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    margin-bottom: var(--moon-space-sm);
+    transition: background var(--moon-transition);
+    cursor: pointer;
+}
+
+.moon-result-item:hover {
+    background: var(--moon-bg);
+}
+
+.moon-result-item:last-child {
+    margin-bottom: 0;
+}
+
+.moon-result-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.moon-result-number {
+    width: 24px;
+    height: 24px;
+    background: var(--moon-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.moon-result-label {
+    flex: 1;
+    font-weight: 500;
+    color: var(--moon-text);
+}
+
+.moon-result-coords {
+    font-size: 11px;
+    color: var(--moon-text-muted);
+    font-family: var(--moon-font-mono);
+}
+
+.moon-no-results {
+    color: var(--moon-text-muted);
+    font-size: 14px;
+    text-align: center;
+    padding: var(--moon-space-lg);
+}
+
+.moon-result-section { margin-bottom: var(--moon-space-lg); }
+.moon-result-section:last-child { margin-bottom: 0; }
+
+.moon-result-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--moon-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--moon-space-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-sm);
+}
+
+.moon-result-section p { color: var(--moon-text); line-height: 1.6; }
+
+.moon-list { list-style: none; padding: 0; }
+
+.moon-list li {
+    position: relative;
+    padding-left: var(--moon-space-lg);
+    margin-bottom: var(--moon-space-sm);
+    color: var(--moon-text-secondary);
+}
+
+.moon-list li:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--moon-primary);
+}
+
+/* ============================================================
+   CAPTION / Q&A DISPLAY
+   ============================================================ */
+.moon-caption-result {
+    margin-top: var(--moon-space-md);
+}
+
+.moon-caption-text {
+    padding: var(--moon-space-lg);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    border-left: 4px solid var(--moon-primary);
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--moon-text);
+    margin: 0;
+}
+
+.moon-caption-display {
+    padding: var(--moon-space-lg);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    border-left: 4px solid var(--moon-primary);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--moon-text);
+}
+
+.moon-qa-result {
+    margin-top: var(--moon-space-md);
+}
+
+.moon-qa-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--moon-space-md);
+}
+
+.moon-qa-input-group {
+    display: flex;
+    gap: var(--moon-space-sm);
+}
+
+.moon-qa-input-group .moon-input {
+    flex: 1;
+}
+
+.moon-qa-history {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.moon-qa-item {
+    padding: var(--moon-space-md);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    margin-bottom: var(--moon-space-sm);
+}
+
+.moon-qa-item:last-child {
+    margin-bottom: 0;
+}
+
+.moon-qa-question {
+    font-weight: 500;
+    color: var(--moon-primary);
+    margin-bottom: var(--moon-space-xs);
+}
+
+.moon-qa-answer {
+    color: var(--moon-text);
+    line-height: 1.6;
+}
+
+/* ============================================================
+   PERSON/FACE TRACKER SPECIFIC
+   ============================================================ */
+.moon-tracker-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--moon-space-md);
+}
+
+.moon-tracker-stat {
+    padding: var(--moon-space-md);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    text-align: center;
+}
+
+.moon-tracker-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--moon-primary);
+}
+
+.moon-tracker-stat-label {
+    font-size: 12px;
+    color: var(--moon-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   DETAILS/ACCORDION
+   ============================================================ */
+.moon-details { margin-top: var(--moon-space-lg); }
+
+.moon-details summary {
+    cursor: pointer;
+    color: var(--moon-text-muted);
+    font-size: 13px;
+    padding: var(--moon-space-sm) 0;
+    user-select: none;
+}
+
+.moon-details summary:hover { color: var(--moon-text-secondary); }
+
+.moon-pre {
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    padding: var(--moon-space-md);
+    overflow-x: auto;
+    font-family: var(--moon-font-mono);
+    font-size: 12px;
+    color: var(--moon-text-secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* ============================================================
+   ALERTS / ERRORS
+   ============================================================ */
+.moon-alert {
+    padding: var(--moon-space-md);
+    border-radius: var(--moon-radius);
+    margin-bottom: var(--moon-space-md);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--moon-space-md);
+    flex-wrap: wrap;
+}
+
+.moon-alert-error {
+    background: var(--moon-error-bg);
+    color: var(--moon-error);
+    border: 1px solid var(--moon-error);
+}
+
+.moon-error-message {
+    flex: 1;
+    min-width: 200px;
+}
+
+.moon-error-action {
+    flex-shrink: 0;
+    background: var(--moon-error);
+    color: white;
+    border-color: var(--moon-error);
+}
+
+.moon-error-action:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.moon-alert-success {
+    background: var(--moon-success-bg);
+    color: var(--moon-success);
+    border: 1px solid var(--moon-success);
+}
+
+.moon-alert-warning {
+    background: var(--moon-warning-bg);
+    color: var(--moon-warning);
+    border: 1px solid var(--moon-warning);
+}
+
+.moon-alert-info {
+    background: var(--moon-info-bg);
+    color: var(--moon-info);
+    border: 1px solid var(--moon-info);
+}
+
+.moon-error { display: none; }
+.moon-error-text { color: var(--moon-error); }
+
+/* Error banner - positioned to not cause layout shift */
+.moon-error-banner {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: var(--moon-space-md);
+    background: var(--moon-error);
+    color: white;
+    border-radius: var(--moon-radius);
+    margin-bottom: var(--moon-space-md);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--moon-space-md);
+    flex-wrap: wrap;
+    font-size: 14px;
+    box-shadow: var(--moon-shadow);
+}
+
+.moon-error-banner .moon-error-message {
+    flex: 1;
+    min-width: 200px;
+}
+
+.moon-error-banner .moon-error-action {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.moon-error-banner .moon-error-action:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.moon-error-banner .moon-error-dismiss {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    padding: var(--moon-space-xs);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.moon-error-banner .moon-error-dismiss:hover {
+    color: white;
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+.moon-toast-container {
+    position: fixed;
+    bottom: var(--moon-space-lg);
+    right: var(--moon-space-lg);
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: var(--moon-space-sm);
+    pointer-events: none;
+}
+
+.moon-toast {
+    padding: var(--moon-space-md) var(--moon-space-lg);
+    border-radius: var(--moon-radius);
+    box-shadow: var(--moon-shadow-lg);
+    font-size: 14px;
+    font-weight: 500;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    max-width: 350px;
+}
+
+.moon-toast-visible {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.moon-toast-success {
+    background: var(--moon-success);
+    color: white;
+}
+
+.moon-toast-error {
+    background: var(--moon-error);
+    color: white;
+}
+
+.moon-toast-info {
+    background: var(--moon-info);
+    color: white;
+}
+
+.moon-toast-warning {
+    background: var(--moon-warning);
+    color: white;
+}
+
+/* ============================================================
+   LOADING STATE
+   ============================================================ */
+.moon-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 15, 26, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    border-radius: var(--moon-radius-lg);
+}
+
+.moon-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--moon-border);
+    border-top-color: var(--moon-primary);
+    border-radius: 50%;
+    animation: moonSpin 1s linear infinite;
+}
+
+.moon-loading-text {
+    margin-top: var(--moon-space-md);
+    color: var(--moon-text);
+    font-size: 14px;
+}
+
+.moon-widget-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.moon-card {
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    padding: var(--moon-space-md);
+    border: 1px solid var(--moon-border);
+    transition: border-color var(--moon-transition), box-shadow var(--moon-transition);
+}
+
+.moon-card:hover { border-color: var(--moon-border-light); }
+
+.moon-shot-card {
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    padding: var(--moon-space-md);
+    border: 2px solid var(--moon-border);
+    cursor: pointer;
+    transition: all var(--moon-transition);
+    margin-bottom: var(--moon-space-sm);
+}
+
+.moon-shot-card:hover {
+    border-color: var(--moon-border-light);
+    background: var(--moon-bg-secondary);
+}
+
+.moon-shot-card.moon-active {
+    border-color: var(--moon-primary);
+    background: var(--moon-primary-light);
+}
+
+.moon-shot-card h4 { font-size: 15px; font-weight: 600; color: var(--moon-text); margin-bottom: var(--moon-space-xs); }
+.moon-shot-card p { font-size: 13px; color: var(--moon-text-secondary); }
+
+.moon-shot-list { max-height: 400px; overflow-y: auto; }
+.moon-hint { font-size: 13px; color: var(--moon-text-muted); margin-bottom: var(--moon-space-md); }
+
+/* ============================================================
+   STYLE CARDS (Overlay Stylist)
+   ============================================================ */
+.moon-style-card {
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    padding: var(--moon-space-md);
+    border: 2px solid var(--moon-border);
+    cursor: pointer;
+    transition: all var(--moon-transition);
+    margin-bottom: var(--moon-space-sm);
+}
+
+.moon-style-card:hover { border-color: var(--moon-border-light); }
+
+.moon-style-card.moon-active {
+    border-color: var(--moon-primary);
+    background: var(--moon-primary-light);
+}
+
+.moon-style-card h4 { font-size: 15px; font-weight: 600; margin-bottom: var(--moon-space-xs); }
+.moon-style-card p { font-size: 13px; color: var(--moon-text-secondary); margin-bottom: var(--moon-space-sm); }
+.moon-style-position { font-size: 11px; color: var(--moon-text-muted); text-transform: uppercase; }
+
+.moon-color-swatches { display: flex; gap: var(--moon-space-xs); margin-top: var(--moon-space-sm); }
+.moon-swatch { width: 24px; height: 24px; border-radius: var(--moon-radius-sm); border: 1px solid var(--moon-border); }
+
+/* ============================================================
+   LOWER THIRD PREVIEW
+   ============================================================ */
+.moon-overlay-preview { position: relative; margin-top: var(--moon-space-md); }
+
+.moon-lower-third-preview {
+    position: absolute;
+    bottom: 10%;
+    padding: var(--moon-space-md) var(--moon-space-lg);
+    background: linear-gradient(135deg, var(--lt-primary, #1a1a2e), var(--lt-secondary, #16213e));
+    border-left: 4px solid var(--moon-primary);
+    animation: moonSlideIn 0.3s ease;
+}
+
+.moon-lt-bottomleft { left: 5%; }
+.moon-lt-bottomcenter { left: 50%; transform: translateX(-50%); }
+.moon-lt-bottomright { right: 5%; }
+
+.moon-lt-content { color: var(--lt-text, #ffffff); }
+.moon-lt-name { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+.moon-lt-tagline { font-size: 14px; opacity: 0.9; }
+
+@keyframes moonSlideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* ============================================================
+   QUALITY CHECK
+   ============================================================ */
+.moon-quality-overall {
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-md);
+    padding: var(--moon-space-lg);
+    border-radius: var(--moon-radius);
+    margin-bottom: var(--moon-space-lg);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.moon-quality-good { background: var(--moon-success-bg); color: var(--moon-success); }
+.moon-quality-ok { background: var(--moon-warning-bg); color: var(--moon-warning); }
+.moon-quality-poor { background: var(--moon-error-bg); color: var(--moon-error); }
+.moon-quality-icon { font-size: 28px; }
+
+.moon-quality-sections { display: flex; flex-direction: column; gap: var(--moon-space-md); }
+
+.moon-quality-section {
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    padding: var(--moon-space-md);
+}
+
+.moon-quality-section h4 { font-size: 14px; font-weight: 600; margin-bottom: var(--moon-space-sm); color: var(--moon-text); }
+.moon-quality-desc { color: var(--moon-text-secondary); margin-bottom: var(--moon-space-sm); font-size: 14px; }
+.moon-quality-tips { font-size: 13px; }
+.moon-quality-tips li { color: var(--moon-text-muted); }
+
+/* ============================================================
+   TAGS
+   ============================================================ */
+.moon-tag-section { margin-bottom: var(--moon-space-lg); }
+
+.moon-tag-section h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--moon-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--moon-space-sm);
+}
+
+.moon-tags { display: flex; flex-wrap: wrap; gap: var(--moon-space-sm); }
+
+.moon-tag {
+    display: inline-block;
+    padding: var(--moon-space-xs) var(--moon-space-md);
+    background: var(--moon-bg-tertiary);
+    border: 1px solid var(--moon-border);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--moon-text-secondary);
+    transition: all var(--moon-transition);
+}
+
+.moon-tag:hover { background: var(--moon-bg-secondary); border-color: var(--moon-border-light); }
+
+.moon-tag-primary {
+    background: var(--moon-primary-light);
+    border-color: var(--moon-primary);
+    color: var(--moon-primary);
+    font-weight: 500;
+}
+
+.moon-copy-tags-btn { margin-top: var(--moon-space-md); }
+
+/* ============================================================
+   SHOW NOTES
+   ============================================================ */
+.moon-frame-count {
+    font-size: 13px;
+    color: var(--moon-text-muted);
+    padding: var(--moon-space-sm);
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    text-align: center;
+}
+
+.moon-frame-num { font-weight: 700; color: var(--moon-primary); font-size: 18px; }
+
+.moon-chapter {
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    padding: var(--moon-space-md);
+    margin-bottom: var(--moon-space-sm);
+}
+
+.moon-chapter strong { display: block; margin-bottom: var(--moon-space-xs); color: var(--moon-text); }
+.moon-chapter p { font-size: 13px; color: var(--moon-text-secondary); }
+
+/* ============================================================
+   SPINNER
+   ============================================================ */
+.moon-spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: moonSpin 0.8s linear infinite;
+}
+
+.moon-spinner.moon-active {
+    display: inline-block;
+}
+
+@keyframes moonSpin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+.moon-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--moon-space-xs);
+    padding: var(--moon-space-xs) var(--moon-space-sm);
+    border-radius: var(--moon-radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.moon-status-success {
+    background: var(--moon-success-bg);
+    color: var(--moon-success);
+}
+
+.moon-status-warning {
+    background: var(--moon-warning-bg);
+    color: var(--moon-warning);
+}
+
+.moon-status-error {
+    background: var(--moon-error-bg);
+    color: var(--moon-error);
+}
+
+.moon-status-info {
+    background: var(--moon-info-bg);
+    color: var(--moon-info);
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.moon-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--moon-space-xl);
+    text-align: center;
+    color: var(--moon-text-muted);
+}
+
+.moon-empty-icon {
+    font-size: 48px;
+    margin-bottom: var(--moon-space-md);
+    opacity: 0.5;
+}
+
+.moon-empty-text {
+    font-size: 14px;
+    max-width: 300px;
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN
+   ============================================================ */
+@media (max-width: 1024px) {
+    .moon-grid-2 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .moon-dashboard { flex-direction: column; }
+
+    .moon-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--moon-border);
+    }
+
+    .moon-sidebar-title { padding: var(--moon-space-md); }
+
+    .moon-nav {
+        display: flex;
+        overflow-x: auto;
+        padding: 0 var(--moon-space-md) var(--moon-space-md);
+        gap: var(--moon-space-xs);
+    }
+
+    .moon-nav-item {
+        flex-direction: column;
+        padding: var(--moon-space-sm) var(--moon-space-md);
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        border-radius: var(--moon-radius);
+        min-width: auto;
+        text-align: center;
+    }
+
+    .moon-nav-item.moon-active {
+        border-left: none;
+        border-bottom-color: var(--moon-primary);
+    }
+
+    .moon-nav-label { font-size: 11px; }
+    .moon-main { padding: var(--moon-space-md); }
+    .moon-widget-title { font-size: 20px; }
+    .moon-media-controls { flex-direction: column; }
+    .moon-media-controls .moon-btn { width: 100%; }
+
+    .moon-api-status {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--moon-space-sm) var(--moon-space-md);
+    }
+
+    .moon-count-number { font-size: 48px; }
+    .moon-tracker-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+    .moon-nav-label { display: none; }
+    .moon-nav-icon { font-size: 24px; }
+    .moon-nav-item { padding: var(--moon-space-sm); }
+    .moon-video-container { aspect-ratio: 4 / 3; }
+    .moon-count-number { font-size: 36px; }
+    .moon-count-small { font-size: 28px; }
+}
+
+/* ============================================================
+   STANDALONE WIDGET MODE
+   ============================================================ */
+.moon-widget-standalone {
+    padding: var(--moon-space-lg);
+    background: var(--moon-bg);
+    min-height: 100vh;
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+.moon-btn:focus-visible,
+.moon-input:focus-visible,
+.moon-nav-item:focus-visible,
+.moon-shot-card:focus-visible,
+.moon-style-card:focus-visible {
+    outline: 2px solid var(--moon-primary);
+    outline-offset: 2px;
+}
+
+.moon-details summary:focus-visible {
+    outline: 2px solid var(--moon-primary);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .moon-btn { border-width: 2px; }
+    .moon-tag { border-width: 2px; }
+    .moon-shot-card, .moon-style-card { border-width: 2px; }
+}
