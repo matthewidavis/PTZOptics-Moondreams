@@ -92,7 +92,7 @@ This is the same type of technology used in self-driving cars, security systems,
 | Orientation | MediaPipe | Is the subject facing the camera? |
 | Talking | MediaPipe | Is the subject speaking? |
 | Focus | OpenCV | Is the image sharp or blurry? |
-| Lighting | Canvas | Is the scene properly exposed? |
+| Lighting | OpenCV | Is the scene properly exposed? |
 | Presence | MoonDream | Is a face detected in frame? |
 | Composition | MoonDream | Is the subject well-framed and positioned? |
 | Scene Context | MoonDream | AI description of what's happening |
