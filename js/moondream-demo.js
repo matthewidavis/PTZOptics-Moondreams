@@ -334,22 +334,41 @@
                     return;
                 }
 
-                navigator.mediaDevices.getUserMedia({
-                    video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+                // Use simpler constraints for better compatibility
+                var constraints = {
+                    video: true,
                     audio: false
-                }).then(function(stream) {
+                };
+
+                navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
                     self.stream = stream;
                     self.videoElement = videoElement;
                     videoElement.srcObject = stream;
-                    videoElement.play();
-                    resolve(stream);
+
+                    // Wait for video to be ready before resolving
+                    videoElement.onloadedmetadata = function() {
+                        videoElement.play().then(function() {
+                            resolve(stream);
+                        }).catch(function(playErr) {
+                            reject(new Error('Could not start video playback'));
+                        });
+                    };
+
+                    videoElement.onerror = function() {
+                        reject(new Error('Video element error'));
+                    };
                 }).catch(function(err) {
+                    console.error('Webcam error:', err.name, err.message);
                     if (err.name === 'NotAllowedError') {
-                        reject(new Error('Camera permission denied'));
+                        reject(new Error('Camera permission denied. Please allow camera access and try again.'));
                     } else if (err.name === 'NotFoundError') {
-                        reject(new Error('No camera found'));
+                        reject(new Error('No camera found. Please connect a webcam and try again.'));
+                    } else if (err.name === 'NotReadableError') {
+                        reject(new Error('Camera is in use by another application. Please close other apps using the camera.'));
+                    } else if (err.name === 'OverconstrainedError') {
+                        reject(new Error('Camera does not support requested settings. Trying again...'));
                     } else {
-                        reject(new Error('Camera error: ' + err.message));
+                        reject(new Error('Camera error: ' + (err.message || err.name)));
                     }
                 });
             });
