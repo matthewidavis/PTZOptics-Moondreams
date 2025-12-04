@@ -2414,7 +2414,7 @@
             { key: 'orientation', label: 'Orientation', icon: '📐', source: 'MediaPipe' },
             { key: 'talking', label: 'Talking', icon: '🗣️', source: 'MediaPipe' },
             { key: 'focus', label: 'Focus', icon: '🎯', source: 'OpenCV' },
-            { key: 'lighting', label: 'Lighting', icon: '💡', source: 'Canvas' },
+            { key: 'lighting', label: 'Lighting', icon: '💡', source: 'OpenCV' },
             { key: 'presence', label: 'Presence', icon: '👁️', source: 'MoonDream' },
             { key: 'composition', label: 'Composition', icon: '🖼️', source: 'MoonDream' },
             { key: 'sceneContext', label: 'Scene Context', icon: '🎬', source: 'MoonDream' }
