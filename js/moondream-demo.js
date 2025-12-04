@@ -957,9 +957,20 @@
                 self._currentImage = dataUrl;
                 var img = new Image();
                 img.onload = function() {
-                    imageCanvas.width = img.width;
-                    imageCanvas.height = img.height;
-                    imageCanvas.getContext('2d').drawImage(img, 0, 0);
+                    // Get container dimensions for scaling
+                    var containerRect = videoContainer.getBoundingClientRect();
+                    var maxWidth = containerRect.width;
+                    var maxHeight = containerRect.height;
+
+                    // Calculate scaled dimensions to fit within container
+                    var scale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
+                    var canvasWidth = Math.floor(img.width * scale);
+                    var canvasHeight = Math.floor(img.height * scale);
+
+                    // Set canvas to scaled size for display
+                    imageCanvas.width = canvasWidth;
+                    imageCanvas.height = canvasHeight;
+                    imageCanvas.getContext('2d').drawImage(img, 0, 0, canvasWidth, canvasHeight);
                     imageCanvas.style.display = 'block';
                     video.style.display = 'none';
                     placeholder.style.display = 'none';
@@ -1007,20 +1018,38 @@
         var video = this._media.video;
         var imageCanvas = this._media.imageCanvas;
         var overlay = this._media.overlay;
+        var container = this._media.videoContainer;
 
-        var width, height;
+        var width, height, sourceEl;
         if (video.style.display !== 'none' && video.videoWidth) {
             width = video.videoWidth;
             height = video.videoHeight;
+            sourceEl = video;
         } else if (imageCanvas.style.display !== 'none') {
             width = imageCanvas.width;
             height = imageCanvas.height;
+            sourceEl = imageCanvas;
         } else {
             return;
         }
 
         overlay.width = width;
         overlay.height = height;
+
+        // Position overlay to match the source element within the container
+        if (sourceEl && container) {
+            var containerRect = container.getBoundingClientRect();
+            var sourceRect = sourceEl.getBoundingClientRect();
+
+            // Calculate offset from container
+            var offsetLeft = sourceRect.left - containerRect.left;
+            var offsetTop = sourceRect.top - containerRect.top;
+
+            overlay.style.left = offsetLeft + 'px';
+            overlay.style.top = offsetTop + 'px';
+            overlay.style.width = sourceRect.width + 'px';
+            overlay.style.height = sourceRect.height + 'px';
+        }
     };
 
     WidgetBase.prototype.getCurrentFrame = function() {
@@ -1494,41 +1523,78 @@
         var qaSection = Utils.createElement('div', 'moon-section');
         qaSection.innerHTML = '<h3 class="moon-section-title">Ask a Question</h3>';
 
+        var qaInputRow = Utils.createElement('div', 'moon-input-row');
         var qaInput = Utils.createElement('input', 'moon-input moon-qa-input', {
             type: 'text',
             placeholder: 'e.g., How many people are there? What color is the car?'
         });
-        qaSection.appendChild(qaInput);
+
+        // Bind Enter key to ask
+        qaInput.onkeydown = function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                self.ensureApiKey(function() { self.askQuestion(); });
+            }
+        };
+        qaInputRow.appendChild(qaInput);
+
+        var askBtn = Utils.createElement('button', 'moon-btn moon-btn-primary', {
+            textContent: 'Ask'
+        });
+        askBtn.onclick = function() {
+            self.ensureApiKey(function() { self.askQuestion(); });
+        };
+        qaInputRow.appendChild(askBtn);
+        qaSection.appendChild(qaInputRow);
 
         var quickQs = Utils.createElement('div', 'moon-quick-btns');
         ['How many people?', 'What is happening?', 'What objects are visible?', 'Is anyone wearing glasses?'].forEach(function(q) {
             var btn = Utils.createElement('button', 'moon-btn moon-btn-sm moon-btn-quick', { textContent: q });
             btn.onclick = function() {
                 qaInput.value = q;
-                self.askQuestion();
+                self.ensureApiKey(function() { self.askQuestion(); });
             };
             quickQs.appendChild(btn);
         });
         qaSection.appendChild(quickQs);
 
-        var askBtn = Utils.createElement('button', 'moon-btn moon-btn-secondary', {
-            textContent: 'Ask'
-        });
-        askBtn.onclick = function() {
-            self.ensureApiKey(function() { self.askQuestion(); });
-        };
-        qaSection.appendChild(askBtn);
+        // Tabbed results area
+        var tabContainer = Utils.createElement('div', 'moon-tabs');
 
-        var qaResult = Utils.createElement('div', 'moon-qa-result');
-        qaSection.appendChild(qaResult);
+        var tabNav = Utils.createElement('div', 'moon-tab-nav');
+        var tabAnswer = Utils.createElement('button', 'moon-tab-btn moon-tab-active', { textContent: 'Answer' });
+        var tabHistory = Utils.createElement('button', 'moon-tab-btn', { textContent: 'History' });
+        tabNav.appendChild(tabAnswer);
+        tabNav.appendChild(tabHistory);
+        tabContainer.appendChild(tabNav);
+
+        var tabContent = Utils.createElement('div', 'moon-tab-content');
+
+        var answerPanel = Utils.createElement('div', 'moon-tab-panel moon-tab-panel-active moon-qa-result');
+        answerPanel.innerHTML = '<p class="moon-qa-placeholder">Ask a question to see the AI response</p>';
+        tabContent.appendChild(answerPanel);
+
+        var historyPanel = Utils.createElement('div', 'moon-tab-panel moon-history-list');
+        tabContent.appendChild(historyPanel);
+
+        tabContainer.appendChild(tabContent);
+        qaSection.appendChild(tabContainer);
+
+        // Tab switching
+        tabAnswer.onclick = function() {
+            tabAnswer.classList.add('moon-tab-active');
+            tabHistory.classList.remove('moon-tab-active');
+            answerPanel.classList.add('moon-tab-panel-active');
+            historyPanel.classList.remove('moon-tab-panel-active');
+        };
+        tabHistory.onclick = function() {
+            tabHistory.classList.add('moon-tab-active');
+            tabAnswer.classList.remove('moon-tab-active');
+            historyPanel.classList.add('moon-tab-panel-active');
+            answerPanel.classList.remove('moon-tab-panel-active');
+        };
 
         rightCol.appendChild(qaSection);
-
-        // Conversation history
-        var historySection = Utils.createElement('div', 'moon-section moon-history-section');
-        historySection.innerHTML = '<h3 class="moon-section-title">Conversation</h3>' +
-            '<div class="moon-history-list"></div>';
-        rightCol.appendChild(historySection);
 
         grid.appendChild(rightCol);
         body.appendChild(grid);
@@ -1536,8 +1602,8 @@
 
         this._captionResult = captionResult;
         this._qaInput = qaInput;
-        this._qaResult = qaResult;
-        this._historyList = historySection.querySelector('.moon-history-list');
+        this._qaResult = answerPanel;
+        this._historyList = historyPanel;
     };
 
     SceneAnalyzerWidget.prototype.captionScene = function() {
@@ -1582,7 +1648,7 @@
             var answer = response.answer || 'No answer available';
             self._qaResult.innerHTML = '<p class="moon-qa-answer">' + Utils.escapeHTML(answer) + '</p>';
             self.addToHistory(question, answer);
-            self._qaInput.value = '';
+            // Keep question in input for follow-up refinement
         }).catch(function(err) {
             self._qaResult.innerHTML = '<p class="moon-error-text">' + err.message + '</p>';
         });
@@ -1892,8 +1958,8 @@
 
         var detectInput = Utils.createElement('input', 'moon-input moon-zone-detect-input', {
             type: 'text',
-            placeholder: 'e.g., person, forklift, vehicle...',
-            value: 'person'
+            placeholder: 'e.g., face, person, forklift, vehicle...',
+            value: 'face'
         });
         detectGroup.appendChild(detectInput);
         rightCol.appendChild(detectGroup);

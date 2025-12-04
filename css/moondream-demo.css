@@ -662,11 +662,18 @@
     justify-content: center;
 }
 
-.moon-video,
-.moon-capture-canvas {
+.moon-video {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    background: #000;
+}
+
+.moon-capture-canvas,
+.moon-image-canvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
     background: #000;
 }
 
@@ -722,10 +729,6 @@
 /* Canvas overlay for bounding boxes, points, zones */
 .moon-overlay-canvas {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     pointer-events: none;
     z-index: 10;
 }
@@ -1168,6 +1171,92 @@
     font-size: 16px;
     line-height: 1.7;
     color: var(--moon-text);
+}
+
+/* ============================================================
+   TABS COMPONENT
+   ============================================================ */
+.moon-tabs {
+    margin-top: var(--moon-space-md);
+}
+
+.moon-tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--moon-border);
+    margin-bottom: 0;
+}
+
+.moon-tab-btn {
+    padding: var(--moon-space-sm) var(--moon-space-lg);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--moon-text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--moon-transition);
+    margin-bottom: -1px;
+}
+
+.moon-tab-btn:hover {
+    color: var(--moon-text-secondary);
+}
+
+.moon-tab-btn.moon-tab-active {
+    color: var(--moon-primary);
+    border-bottom-color: var(--moon-primary);
+}
+
+.moon-tab-content {
+    background: var(--moon-bg-tertiary);
+    border-radius: 0 0 var(--moon-radius) var(--moon-radius);
+    min-height: 120px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.moon-tab-panel {
+    display: none;
+    padding: var(--moon-space-md);
+}
+
+.moon-tab-panel-active {
+    display: block;
+}
+
+.moon-qa-placeholder {
+    color: var(--moon-text-muted);
+    font-style: italic;
+}
+
+/* History items in tab */
+.moon-history-item {
+    padding: var(--moon-space-sm) 0;
+    border-bottom: 1px solid var(--moon-border);
+}
+
+.moon-history-item:last-child {
+    border-bottom: none;
+}
+
+.moon-history-q {
+    color: var(--moon-text-secondary);
+    font-size: 13px;
+    margin-bottom: var(--moon-space-xs);
+}
+
+.moon-history-a {
+    color: var(--moon-text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.moon-history-q strong,
+.moon-history-a strong {
+    color: var(--moon-primary);
+    margin-right: var(--moon-space-xs);
 }
 
 .moon-qa-result {

@@ -1,16 +1,18 @@
 # PTZOptics Moondreams
 
-**AI Vision Demos for Video Production**
+**Visual Reasoning Demos for Video Production**
 
-Welcome! This interactive demo shows how artificial intelligence can "see" and understand what's in your camera feed. Whether you're a live streamer, video producer, or just curious about AI, these demos let you experience computer vision firsthand.
+Welcome! This interactive demo shows how artificial intelligence can "see" and understand what's in your camera feed. Using a technique called **visual reasoning**, AI doesn't just detect objects—it actually interprets and thinks about what it sees. Whether you're a live streamer, video producer, or just curious about AI, these demos let you experience visual reasoning firsthand.
 
 **[Try the Live Demo](https://matthewidavis.github.io/PTZOptics-Moondreams/)**
 
 ---
 
-## What Is This?
+## What Is Visual Reasoning?
 
-These demos use **MoonDream**, a vision AI model that can look at images and understand what's in them. Unlike chatbots that only work with text, MoonDream actually "sees" your webcam feed or uploaded images and can:
+**Visual reasoning** is AI's ability to not just see an image, but to understand and think about it. Traditional computer vision simply recognizes patterns—"that's a cat." Visual reasoning goes further—"that's a cat sitting on a red couch, looking at something outside the window."
+
+These demos use **MoonDream**, a visual reasoning model that can look at images and truly understand what's in them. Unlike chatbots that only work with text, MoonDream actually "sees" your webcam feed or uploaded images and can:
 
 - Identify objects and people
 - Count things in a scene
@@ -49,7 +51,7 @@ This is the same type of technology used in self-driving cars, security systems,
 - **Caption:** The AI writes a sentence describing your entire scene
 - **Q&A:** You ask questions and the AI answers based on what it sees
 
-**Why it's useful:** This is how accessibility features describe images to visually impaired users. It's also how AI can automatically generate descriptions for video archives or social media posts.
+**Why it's useful:** This demo best showcases visual reasoning—the AI doesn't just list objects, it understands context and relationships. This is how accessibility features describe images to visually impaired users. It's also how AI can automatically generate descriptions for video archives or social media posts.
 
 **Try this:**
 - Click "Caption" to see how the AI describes your room
@@ -105,17 +107,17 @@ Your API key is saved in your browser and never shared with anyone except MoonDr
 
 ---
 
-## How Does It Work?
+## How Does Visual Reasoning Work?
 
 When you click "Detect" or "Analyze", here's what happens:
 
 1. **Capture:** The demo takes a snapshot from your webcam
 2. **Send:** That image is sent to MoonDream's AI servers
-3. **Process:** MoonDream's vision model analyzes the image
+3. **Reason:** MoonDream's visual reasoning model analyzes the image—identifying objects, understanding spatial relationships, and interpreting context
 4. **Return:** Results come back (usually in 1-3 seconds)
 5. **Display:** Boxes, dots, or text are drawn on your screen
 
-The AI model has been trained on millions of images to recognize objects, understand scenes, and answer questions. It doesn't actually "think"—it's pattern matching at an incredibly sophisticated level.
+The AI model has been trained on millions of images to recognize objects, understand scenes, and answer questions. What makes visual reasoning special is that it connects vision with language—the AI can explain what it sees in natural language, not just output coordinates or labels.
 
 ---
 
@@ -158,9 +160,9 @@ Unlike some AI tools, these demos don't show confidence percentages. If somethin
 
 ## About the Technology
 
-**MoonDream** is a vision-language model, meaning it understands both images and text. This lets it answer open-ended questions about what it sees, rather than just detecting pre-defined categories.
+**MoonDream** is a visual reasoning model (also called a vision-language model), meaning it understands both images and text together. This lets it answer open-ended questions about what it sees, rather than just detecting pre-defined categories. Visual reasoning bridges the gap between seeing and understanding.
 
-**PTZOptics** creates professional PTZ (pan-tilt-zoom) cameras for live streaming, broadcasting, and video production. These demos explore how AI vision can enhance camera automation and production workflows.
+**PTZOptics** creates professional PTZ (pan-tilt-zoom) cameras for live streaming, broadcasting, and video production. These demos explore how visual reasoning can enhance camera automation and production workflows—imagine cameras that don't just track motion, but understand what's happening in a scene.
 
 ---
 
@@ -172,4 +174,4 @@ Unlike some AI tools, these demos don't show confidence percentages. If somethin
 
 ---
 
-*Built with MoonDream AI and designed for video production enthusiasts, educators, and anyone curious about computer vision.*
+*Built with MoonDream AI and designed for video production enthusiasts, educators, and anyone curious about visual reasoning and computer vision.*
