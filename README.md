@@ -1,6 +1,6 @@
-# PTZOptics Moondreams
+# PTZOptics Visual Reasoning Playground
 
-**Visual Reasoning Demos for Video Production**
+**Visual Reasoning Playground**
 
 Welcome! This interactive demo shows how artificial intelligence can "see" and understand what's in your camera feed. Using a technique called **visual reasoning**, AI doesn't just detect objects—it actually interprets and thinks about what it sees. Whether you're a live streamer, video producer, or just curious about AI, these demos let you experience visual reasoning firsthand.
 
