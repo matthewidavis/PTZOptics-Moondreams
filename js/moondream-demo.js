@@ -3939,7 +3939,7 @@
         });
         ipGroup.appendChild(ipInput);
         var ipHint = Utils.createElement('small', 'moon-input-hint');
-        ipHint.textContent = 'Your PTZ camera must support HTTP CGI control';
+        ipHint.innerHTML = 'Note: HTTP Authentication must be disabled on your camera.<br>Camera Config → System Settings → HTTP Authentication';
         ipGroup.appendChild(ipHint);
         rightCol.appendChild(ipGroup);
         this._ipInput = ipInput;
