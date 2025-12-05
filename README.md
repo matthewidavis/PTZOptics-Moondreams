@@ -125,7 +125,7 @@ This is the same type of technology used in self-driving cars, security systems,
 
 ### First-Time Setup
 
-1. Open the demo: **[matthewidavis.github.io/PTZOptics-Moondreams](https://matthewidavis.github.io/PTZOptics-Moondreams/)**
+1. Open the demo: **[matthewidavis.github.io/PTZOpticsVRP](https://matthewidavis.github.io/PTZOpticsVRP/)**
 2. Click the key icon and paste your MoonDream API key
 3. Click "Start Webcam" to begin
 4. Select any demo from the left sidebar
