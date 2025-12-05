@@ -1,8 +1,8 @@
-# PTZOptics Visual Reasoning Playground
+# PTZOptics Moondreams
 
-**Visual Reasoning Demos**
+**Visual Reasoning Demos for Video Production**
 
-Welcome! This interactive demo shows how artificial intelligence can "see" and understand what's in your camera feed. Using a technique called **visual reasoning**, AI doesn't just detect objects—it actually interprets and thinks about what it sees. Whether you're a video producer, work in industrial manufacturing, healthcare or are just curious about AI, these demos let you experience visual reasoning firsthand.
+Welcome! This interactive demo shows how artificial intelligence can "see" and understand what's in your camera feed. Using a technique called **visual reasoning**, AI doesn't just detect objects—it actually interprets and thinks about what it sees. Whether you're a live streamer, video producer, or just curious about AI, these demos let you experience visual reasoning firsthand.
 
 **[Try the Live Demo](https://matthewidavis.github.io/PTZOpticsVRP/)**
 
@@ -23,7 +23,7 @@ This is the same type of technology used in self-driving cars, security systems,
 
 ---
 
-## The Six Demos
+## The Seven Demos
 
 ### 1. Object Detector
 
@@ -110,6 +110,35 @@ This is the same type of technology used in self-driving cars, security systems,
 
 ---
 
+### 7. PTZ Auto-Tracker
+
+**What it does:** Uses MoonDream AI to detect any object you specify (person, face, hand, ball, etc.), then automatically sends pan/tilt commands to your PTZ camera to keep that object centered in frame. Includes presets for different tracking styles:
+
+| Preset | Detection Rate | Best For |
+|--------|---------------|----------|
+| Smooth | 0.5/sec | Broadcast, graceful movements |
+| Balanced | 1.0/sec | General use |
+| Precise | 1.5/sec | Presentations, tight centering |
+| Fast | 2.0/sec | Sports, action, fast-moving subjects |
+
+**Why it's useful:** This is real PTZ automation—no camera operator needed. Perfect for solo presenters, houses of worship, classrooms, sports broadcasts, or any situation where you want the camera to follow a subject automatically. Works with PTZOptics cameras and other HTTP-controlled PTZ cameras that support CGI commands.
+
+**Try this:**
+1. Enter your PTZ camera's IP address (e.g., 192.168.1.100)
+2. Enter "person" or "face" as the target object
+3. Start your webcam and click "Start Tracking"
+4. Move around the frame and watch your PTZ camera follow you!
+5. The overlay shows the target's position and a line to frame center
+
+**Testing without a PTZ camera:**
+Check "Simulation Mode" to see what PTZ commands would be sent without actually controlling a camera.
+
+**💡 Tip:** Use free [NDI Webcam](https://ndi.video/tools/ndi-tools/) software to bring your PTZ camera's NDI feed into this app as a webcam source for preview.
+
+**Note:** PTZ control requires your camera to be on the same network and accessible via HTTP. PTZOptics cameras work out of the box. Other brands may need different endpoints.
+
+---
+
 ## Getting Started
 
 ### What You'll Need
@@ -180,6 +209,7 @@ Unlike some AI tools, these demos don't show confidence percentages. If somethin
 - **Your webcam feed stays local** until you click an action button
 - **Images are processed, not stored** by MoonDream
 - **Your API key stays in your browser** and is never sent to us
+- **No accounts required** to use these demos
 - **Works offline?** No—AI processing requires internet connection to MoonDream's servers
 
 ---
@@ -196,7 +226,7 @@ Unlike some AI tools, these demos don't show confidence percentages. If somethin
 
 - **MoonDream API:** [docs.moondream.ai](https://docs.moondream.ai)
 - **PTZOptics:** [ptzoptics.com](https://ptzoptics.com)
-- **Issues with this demo:** [GitHub Issues](https://github.com/matthewidavis/PTZOptics-Moondreams/issues)
+- **Issues with this demo:** [GitHub Issues](https://github.com/matthewidavis/PTZOpticsVRP/issues)
 
 ---
 

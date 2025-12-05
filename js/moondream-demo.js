@@ -322,7 +322,9 @@
         stream: null,
         videoElement: null,
         currentResolution: null,
+        currentDeviceId: null,
         supportedResolutions: [],
+        availableCameras: [],
 
         // Common resolutions to test
         standardResolutions: [
@@ -335,6 +337,32 @@
 
         isWebcamSupported: function() {
             return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+        },
+
+        // Get list of available cameras
+        getCameras: function() {
+            var self = this;
+            return new Promise(function(resolve) {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                    resolve([]);
+                    return;
+                }
+
+                navigator.mediaDevices.enumerateDevices().then(function(devices) {
+                    var cameras = devices.filter(function(device) {
+                        return device.kind === 'videoinput';
+                    }).map(function(device, index) {
+                        return {
+                            deviceId: device.deviceId,
+                            label: device.label || ('Camera ' + (index + 1))
+                        };
+                    });
+                    self.availableCameras = cameras;
+                    resolve(cameras);
+                }).catch(function() {
+                    resolve([]);
+                });
+            });
         },
 
         // Probe camera for supported resolutions
@@ -377,7 +405,7 @@
             });
         },
 
-        startWebcam: function(videoElement, resolution) {
+        startWebcam: function(videoElement, resolution, deviceId) {
             var self = this;
             return new Promise(function(resolve, reject) {
                 if (!self.isWebcamSupported()) {
@@ -386,11 +414,17 @@
                 }
 
                 // Build constraints - use exact if resolution specified
+                var videoConstraints = {};
+                if (deviceId) {
+                    videoConstraints.deviceId = { exact: deviceId };
+                }
+                if (resolution) {
+                    videoConstraints.width = { exact: resolution.width };
+                    videoConstraints.height = { exact: resolution.height };
+                }
+
                 var constraints = {
-                    video: resolution ? {
-                        width: { exact: resolution.width },
-                        height: { exact: resolution.height }
-                    } : true,
+                    video: Object.keys(videoConstraints).length > 0 ? videoConstraints : true,
                     audio: false
                 };
 
@@ -398,6 +432,7 @@
                     self.stream = stream;
                     self.videoElement = videoElement;
                     self.currentResolution = resolution || null;
+                    self.currentDeviceId = deviceId || null;
                     videoElement.srcObject = stream;
 
                     // Wait for video to be ready before resolving
@@ -445,9 +480,19 @@
         // Change resolution by restarting stream
         changeResolution: function(videoElement, resolution) {
             var self = this;
+            var deviceId = self.currentDeviceId; // Preserve current camera
             return new Promise(function(resolve, reject) {
                 self.stopWebcam();
-                self.startWebcam(videoElement, resolution).then(resolve).catch(reject);
+                self.startWebcam(videoElement, resolution, deviceId).then(resolve).catch(reject);
+            });
+        },
+
+        // Change to a different camera
+        changeCamera: function(videoElement, deviceId) {
+            var self = this;
+            return new Promise(function(resolve, reject) {
+                self.stopWebcam();
+                self.startWebcam(videoElement, null, deviceId).then(resolve).catch(reject);
             });
         },
 
@@ -991,6 +1036,49 @@
         // Controls
         var controls = Utils.createElement('div', 'moon-media-controls');
 
+        // Camera selector (populated when cameras are enumerated)
+        var cameraSelect = Utils.createElement('select', 'moon-select moon-camera-select');
+        cameraSelect.disabled = true;
+        var defaultCameraOption = document.createElement('option');
+        defaultCameraOption.value = '';
+        defaultCameraOption.textContent = 'Select Camera...';
+        cameraSelect.appendChild(defaultCameraOption);
+
+        cameraSelect.onchange = function() {
+            var deviceId = cameraSelect.value;
+            if (!deviceId || !MediaCapture.stream) return;
+
+            cameraSelect.disabled = true;
+            resolutionSelect.disabled = true;
+            MediaCapture.changeCamera(video, deviceId).then(function() {
+                cameraSelect.disabled = false;
+                self._syncOverlaySize();
+
+                // Update resolution dropdown for new camera
+                MediaCapture.getSupportedResolutions().then(function(resolutions) {
+                    if (resolutions.length > 0) {
+                        resolutionSelect.innerHTML = '';
+                        var currentRes = MediaCapture.currentResolution;
+
+                        resolutions.forEach(function(res, index) {
+                            var option = document.createElement('option');
+                            option.value = index;
+                            option.textContent = res.label;
+                            if (currentRes && res.width === currentRes.width && res.height === currentRes.height) {
+                                option.selected = true;
+                            }
+                            resolutionSelect.appendChild(option);
+                        });
+                        resolutionSelect.disabled = false;
+                    }
+                });
+            }).catch(function(err) {
+                cameraSelect.disabled = false;
+                resolutionSelect.disabled = false;
+                self.showError('Could not switch camera: ' + err.message);
+            });
+        };
+
         // Resolution selector (visible but disabled until webcam starts)
         var resolutionSelect = Utils.createElement('select', 'moon-select moon-resolution-select');
         resolutionSelect.disabled = true;
@@ -1032,6 +1120,7 @@
                     video.style.display = 'none';
                     placeholder.style.display = 'flex';
                     resolutionSelect.disabled = true;
+                    cameraSelect.disabled = true;
                     self.clearOverlay();
                 } else {
                     MediaCapture.startWebcam(video).then(function() {
@@ -1042,6 +1131,27 @@
                         placeholder.style.display = 'none';
                         self.hideError();
                         self._syncOverlaySize();
+
+                        // Enumerate cameras and populate dropdown
+                        MediaCapture.getCameras().then(function(cameras) {
+                            if (cameras.length > 1) {
+                                cameraSelect.innerHTML = '';
+                                cameras.forEach(function(cam) {
+                                    var option = document.createElement('option');
+                                    option.value = cam.deviceId;
+                                    option.textContent = cam.label;
+                                    // Select current camera
+                                    if (MediaCapture.currentDeviceId === cam.deviceId) {
+                                        option.selected = true;
+                                    }
+                                    cameraSelect.appendChild(option);
+                                });
+                                cameraSelect.disabled = false;
+                            } else {
+                                // Only one camera, no need to show selector
+                                cameraSelect.style.display = 'none';
+                            }
+                        });
 
                         // Update resolution dropdown with supported resolutions
                         MediaCapture.getSupportedResolutions().then(function(resolutions) {
@@ -1069,6 +1179,7 @@
                 }
             };
             controls.appendChild(webcamBtn);
+            controls.appendChild(cameraSelect);
             controls.appendChild(resolutionSelect);
         }
 
@@ -3127,6 +3238,502 @@
     };
 
     // ============================================================
+    // WIDGET 7: PTZ AUTO-TRACKER
+    // ============================================================
+    function PTZTrackerWidget() {
+        WidgetBase.call(this,
+            'ptz-tracker',
+            'PTZ Auto-Tracker',
+            '🎯',
+            'AI-powered object tracking that automatically controls PTZ cameras to keep subjects centered in frame.'
+        );
+        this._isTracking = false;
+        this._trackingInterval = null;
+        this._currentDetection = null;
+        this._ptzSettings = {
+            cameraIP: '',
+            targetObject: 'person',
+            detectionRate: 1.0,
+            panSpeed: 5,
+            tiltSpeed: 5,
+            deadzoneX: 5,
+            deadzoneY: 5
+        };
+        this._presets = {
+            smooth: { name: 'Smooth (Broadcast)', rate: 0.5, speed: 3, deadzone: 12 },
+            balanced: { name: 'Balanced (General)', rate: 1.0, speed: 5, deadzone: 5 },
+            precise: { name: 'Precise (Presentation)', rate: 1.5, speed: 6, deadzone: 2 },
+            fast: { name: 'Fast (Sports/Action)', rate: 2.0, speed: 8, deadzone: 8 }
+        };
+    }
+    PTZTrackerWidget.prototype = Object.create(WidgetBase.prototype);
+
+    PTZTrackerWidget.prototype.render = function() {
+        var self = this;
+
+        var header = Utils.createElement('div', 'moon-widget-header');
+        header.innerHTML = '<span class="moon-widget-icon">' + this.icon + '</span>' +
+            '<h2 class="moon-widget-title">' + this.label + '</h2>' +
+            '<p class="moon-widget-desc">' + this.description + '</p>';
+        this.rootEl.appendChild(header);
+
+        var body = Utils.createElement('div', 'moon-widget-body');
+        var grid = Utils.createElement('div', 'moon-grid moon-grid-2');
+
+        // Left column - Video
+        var leftCol = Utils.createElement('div', 'moon-col');
+        leftCol.appendChild(this.createMediaSection());
+
+        // NDI tip for PTZ users
+        var ndiTip = Utils.createElement('div', 'moon-ptz-ndi-tip');
+        ndiTip.innerHTML = '<strong>💡 Tip:</strong> Use free <a href="https://ndi.video/tools/ndi-tools/" target="_blank" rel="noopener">NDI Webcam</a> software to bring your PTZ camera\'s NDI feed into this app as a webcam source for preview.';
+        leftCol.appendChild(ndiTip);
+
+        // Tracking status overlay indicator (under video controls)
+        var statusOverlay = Utils.createElement('div', 'moon-ptz-status-overlay');
+        statusOverlay.innerHTML = '<span class="moon-ptz-status-dot"></span><span class="moon-ptz-status-text">Ready</span>';
+        leftCol.appendChild(statusOverlay);
+        this._statusOverlay = statusOverlay;
+
+        // Tracking Status Display (under video)
+        var statusSection = Utils.createElement('div', 'moon-section moon-ptz-tracking-status');
+        statusSection.innerHTML =
+            '<h3 class="moon-section-title">Tracking Status</h3>' +
+            '<div class="moon-ptz-status-grid">' +
+                '<div class="moon-ptz-stat">' +
+                    '<div class="moon-ptz-stat-label">Object</div>' +
+                    '<div class="moon-ptz-stat-value moon-ptz-object-status">--</div>' +
+                '</div>' +
+                '<div class="moon-ptz-stat">' +
+                    '<div class="moon-ptz-stat-label">Position</div>' +
+                    '<div class="moon-ptz-stat-value moon-ptz-position-status">--</div>' +
+                '</div>' +
+                '<div class="moon-ptz-stat">' +
+                    '<div class="moon-ptz-stat-label">PTZ Command</div>' +
+                    '<div class="moon-ptz-stat-value moon-ptz-command-status">--</div>' +
+                '</div>' +
+                '<div class="moon-ptz-stat">' +
+                    '<div class="moon-ptz-stat-label">Detections</div>' +
+                    '<div class="moon-ptz-stat-value moon-ptz-fps-status">0</div>' +
+                '</div>' +
+            '</div>';
+        leftCol.appendChild(statusSection);
+        this._statusSection = statusSection;
+
+        grid.appendChild(leftCol);
+
+        // Right column - Controls
+        var rightCol = Utils.createElement('div', 'moon-col');
+
+        // PTZ Camera IP
+        var ipGroup = Utils.createElement('div', 'moon-input-group');
+        ipGroup.innerHTML = '<label class="moon-label">PTZ Camera IP Address:</label>';
+        var ipInput = Utils.createElement('input', 'moon-input', {
+            type: 'text',
+            placeholder: '192.168.1.100'
+        });
+        ipGroup.appendChild(ipInput);
+        var ipHint = Utils.createElement('small', 'moon-input-hint');
+        ipHint.textContent = 'Your PTZ camera must support HTTP CGI control';
+        ipGroup.appendChild(ipHint);
+        rightCol.appendChild(ipGroup);
+        this._ipInput = ipInput;
+
+        // Target Object
+        var targetGroup = Utils.createElement('div', 'moon-input-group');
+        targetGroup.innerHTML = '<label class="moon-label">Target Object to Track:</label>';
+        var targetInput = Utils.createElement('input', 'moon-input', {
+            type: 'text',
+            placeholder: 'person, face, hand, ball...',
+            value: 'person'
+        });
+        targetGroup.appendChild(targetInput);
+
+        // Quick presets for target
+        var quickTargets = Utils.createElement('div', 'moon-quick-btns');
+        ['person', 'face', 'hand'].forEach(function(target) {
+            var btn = Utils.createElement('button', 'moon-btn-quick', { textContent: target });
+            btn.onclick = function() { targetInput.value = target; };
+            quickTargets.appendChild(btn);
+        });
+        targetGroup.appendChild(quickTargets);
+        rightCol.appendChild(targetGroup);
+        this._targetInput = targetInput;
+
+        // Operation Style Preset
+        var presetGroup = Utils.createElement('div', 'moon-input-group');
+        presetGroup.innerHTML = '<label class="moon-label">Tracking Style:</label>';
+        var presetSelect = Utils.createElement('select', 'moon-input');
+        presetSelect.innerHTML =
+            '<option value="smooth">Smooth (Broadcast) - 0.5/sec</option>' +
+            '<option value="balanced" selected>Balanced (General) - 1.0/sec</option>' +
+            '<option value="precise">Precise (Presentation) - 1.5/sec</option>' +
+            '<option value="fast">Fast (Sports) - 2.0/sec</option>';
+        presetSelect.onchange = function() {
+            var preset = self._presets[presetSelect.value];
+            if (preset) {
+                rateSlider.value = preset.rate;
+                rateValue.textContent = preset.rate.toFixed(1);
+                self._ptzSettings.detectionRate = preset.rate;
+                self._ptzSettings.panSpeed = preset.speed;
+                self._ptzSettings.tiltSpeed = preset.speed;
+                self._ptzSettings.deadzoneX = preset.deadzone;
+                self._ptzSettings.deadzoneY = preset.deadzone;
+            }
+        };
+        presetGroup.appendChild(presetSelect);
+        rightCol.appendChild(presetGroup);
+        this._presetSelect = presetSelect;
+
+        // Detection Rate Slider
+        var rateGroup = Utils.createElement('div', 'moon-input-group');
+        var rateLabel = Utils.createElement('label', 'moon-label');
+        rateLabel.innerHTML = 'Detection Rate: <span class="moon-rate-value">1.0</span>/sec';
+        var rateValue = rateLabel.querySelector('.moon-rate-value');
+        rateGroup.appendChild(rateLabel);
+
+        var rateSlider = Utils.createElement('input', 'moon-input moon-slider', {
+            type: 'range',
+            min: '0.2',
+            max: '3.0',
+            step: '0.1',
+            value: '1.0'
+        });
+        rateSlider.oninput = function() {
+            var rate = parseFloat(rateSlider.value);
+            rateValue.textContent = rate.toFixed(1);
+            self._ptzSettings.detectionRate = rate;
+            // If tracking, update interval
+            if (self._isTracking) {
+                self.restartTrackingInterval();
+            }
+        };
+        rateGroup.appendChild(rateSlider);
+
+        var rateHint = Utils.createElement('small', 'moon-input-hint');
+        rateHint.textContent = 'Lower = less API usage, Higher = more responsive';
+        rateGroup.appendChild(rateHint);
+        rightCol.appendChild(rateGroup);
+        this._rateSlider = rateSlider;
+        this._rateValue = rateValue;
+
+        // Simulation Mode Toggle
+        var simGroup = Utils.createElement('div', 'moon-input-group moon-checkbox-group');
+        var simLabel = Utils.createElement('label', 'moon-checkbox-label');
+        var simCheckbox = Utils.createElement('input', '', { type: 'checkbox' });
+        simCheckbox.checked = false; // Default to sending real PTZ commands
+        simLabel.appendChild(simCheckbox);
+        simLabel.appendChild(document.createTextNode(' Simulation Mode (no PTZ commands sent)'));
+        simGroup.appendChild(simLabel);
+        var simHint = Utils.createElement('small', 'moon-input-hint');
+        simHint.textContent = 'Check to test without sending commands to your camera';
+        simGroup.appendChild(simHint);
+        rightCol.appendChild(simGroup);
+        this._simCheckbox = simCheckbox;
+
+        // Action Buttons
+        var actions = Utils.createElement('div', 'moon-actions');
+
+        var startBtn = Utils.createElement('button', 'moon-btn moon-btn-success moon-btn-lg moon-btn-action', {
+            textContent: '▶ Start Tracking'
+        });
+        startBtn.onclick = function() {
+            self.ensureApiKey(function() { self.startTracking(); });
+        };
+        actions.appendChild(startBtn);
+        this._startBtn = startBtn;
+
+        var stopBtn = Utils.createElement('button', 'moon-btn moon-btn-danger moon-btn-lg moon-btn-action', {
+            textContent: '■ Stop Tracking',
+            disabled: 'disabled'
+        });
+        stopBtn.onclick = function() { self.stopTracking(); };
+        actions.appendChild(stopBtn);
+        this._stopBtn = stopBtn;
+
+        rightCol.appendChild(actions);
+
+        grid.appendChild(rightCol);
+        body.appendChild(grid);
+        this.rootEl.appendChild(body);
+    };
+
+    PTZTrackerWidget.prototype.startTracking = function() {
+        var self = this;
+
+        if (!MediaCapture.stream) {
+            this.showError('Please start webcam first');
+            return;
+        }
+
+        var target = this._targetInput.value.trim();
+        if (!target) {
+            this.showError('Please enter a target object to track');
+            return;
+        }
+
+        var cameraIP = this._ipInput.value.trim();
+        var isSimulation = this._simCheckbox.checked;
+
+        if (!isSimulation && !cameraIP) {
+            this.showError('Please enter PTZ camera IP or enable simulation mode');
+            return;
+        }
+
+        this._ptzSettings.cameraIP = cameraIP;
+        this._ptzSettings.targetObject = target;
+        this._isTracking = true;
+        this._detectionCount = 0;
+
+        // Update UI
+        this._startBtn.disabled = true;
+        this._stopBtn.disabled = false;
+        this._ipInput.disabled = true;
+        this._targetInput.disabled = true;
+        this._simCheckbox.disabled = true;
+
+        this.updateStatusOverlay('tracking', 'Tracking: ' + target);
+        this.hideError();
+
+        // Start tracking loop
+        this.trackingLoop();
+        this.restartTrackingInterval();
+    };
+
+    PTZTrackerWidget.prototype.stopTracking = function() {
+        this._isTracking = false;
+
+        if (this._trackingInterval) {
+            clearInterval(this._trackingInterval);
+            this._trackingInterval = null;
+        }
+
+        // Send stop command to PTZ (if not simulation)
+        if (!this._simCheckbox.checked && this._ptzSettings.cameraIP) {
+            this.sendPTZCommand('stop');
+        }
+
+        // Clear overlay
+        this.clearOverlay();
+        this._currentDetection = null;
+
+        // Update UI
+        this._startBtn.disabled = false;
+        this._stopBtn.disabled = true;
+        this._ipInput.disabled = false;
+        this._targetInput.disabled = false;
+        this._simCheckbox.disabled = false;
+
+        this.updateStatusOverlay('ready', 'Ready');
+        this.updateTrackingStatus('--', '--', '--');
+    };
+
+    PTZTrackerWidget.prototype.restartTrackingInterval = function() {
+        var self = this;
+        if (this._trackingInterval) {
+            clearInterval(this._trackingInterval);
+        }
+        var intervalMs = 1000 / this._ptzSettings.detectionRate;
+        this._trackingInterval = setInterval(function() {
+            self.trackingLoop();
+        }, intervalMs);
+    };
+
+    PTZTrackerWidget.prototype.trackingLoop = function() {
+        var self = this;
+        if (!this._isTracking) return;
+
+        var frame = this.getCurrentFrame();
+        if (!frame) return;
+
+        ApiClient.detect(frame, this._ptzSettings.targetObject).then(function(response) {
+            if (!self._isTracking) return;
+
+            self._detectionCount = (self._detectionCount || 0) + 1;
+            var objects = response.objects || [];
+
+            // Use first detection
+            self._currentDetection = objects.length > 0 ? objects[0] : null;
+
+            // Draw detection
+            self.drawDetection(self._currentDetection);
+
+            // Calculate PTZ command
+            var ptzCommand = self.calculatePTZCommand(self._currentDetection);
+
+            // Send PTZ command (or simulate)
+            if (!self._simCheckbox.checked && self._ptzSettings.cameraIP) {
+                self.sendPTZCommand(ptzCommand);
+            }
+
+            // Update status display
+            var objectStatus = self._currentDetection ? 'DETECTED' : 'SEARCHING';
+            var positionStatus = self._currentDetection ?
+                self.getPositionDescription(self._currentDetection) : '--';
+            var commandStatus = ptzCommand.toUpperCase();
+
+            self.updateTrackingStatus(objectStatus, positionStatus, commandStatus);
+            self.updateFPSDisplay();
+
+        }).catch(function(err) {
+            console.error('Tracking error:', err);
+            // Continue tracking despite errors
+        });
+    };
+
+    PTZTrackerWidget.prototype.drawDetection = function(detection) {
+        this.clearOverlay();
+        if (!detection || !this.overlayCtx) return;
+
+        var ctx = this.overlayCtx;
+        var w = this.overlayCanvas.width;
+        var h = this.overlayCanvas.height;
+
+        // Draw bounding box
+        var color = '#00ff88';
+        CanvasUtils.drawBoundingBox(ctx, detection, color, this._ptzSettings.targetObject, w, h);
+
+        // Draw center crosshair on target
+        var centerX = (detection.x_min + detection.x_max) / 2 * w;
+        var centerY = (detection.y_min + detection.y_max) / 2 * h;
+
+        ctx.strokeStyle = '#ff6b6b';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 15, centerY);
+        ctx.lineTo(centerX + 15, centerY);
+        ctx.moveTo(centerX, centerY - 15);
+        ctx.lineTo(centerX, centerY + 15);
+        ctx.stroke();
+
+        // Draw frame center reference
+        var frameCenterX = w / 2;
+        var frameCenterY = h / 2;
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(frameCenterX - 30, frameCenterY);
+        ctx.lineTo(frameCenterX + 30, frameCenterY);
+        ctx.moveTo(frameCenterX, frameCenterY - 30);
+        ctx.lineTo(frameCenterX, frameCenterY + 30);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Draw line from object to center
+        ctx.strokeStyle = 'rgba(255,107,107,0.5)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(frameCenterX, frameCenterY);
+        ctx.stroke();
+    };
+
+    PTZTrackerWidget.prototype.calculatePTZCommand = function(detection) {
+        if (!detection) return 'stop';
+
+        // Object position as percentage (0-100)
+        var objectX = ((detection.x_min + detection.x_max) / 2) * 100;
+        var objectY = ((detection.y_min + detection.y_max) / 2) * 100;
+
+        // Target center (50% = true center)
+        var targetX = 50;
+        var targetY = 50;
+
+        // Calculate offset
+        var offsetX = objectX - targetX;
+        var offsetY = objectY - targetY;
+
+        // Half deadzone
+        var halfDeadzoneX = this._ptzSettings.deadzoneX / 2;
+        var halfDeadzoneY = this._ptzSettings.deadzoneY / 2;
+
+        // Determine command (prioritize horizontal)
+        if (offsetX > halfDeadzoneX) {
+            return 'right';
+        } else if (offsetX < -halfDeadzoneX) {
+            return 'left';
+        } else if (offsetY > halfDeadzoneY) {
+            return 'down';
+        } else if (offsetY < -halfDeadzoneY) {
+            return 'up';
+        }
+
+        return 'centered';
+    };
+
+    PTZTrackerWidget.prototype.getPositionDescription = function(detection) {
+        var x = ((detection.x_min + detection.x_max) / 2) * 100;
+        var y = ((detection.y_min + detection.y_max) / 2) * 100;
+
+        var hPos = x < 40 ? 'Left' : (x > 60 ? 'Right' : 'Center');
+        var vPos = y < 40 ? 'Top' : (y > 60 ? 'Bottom' : 'Middle');
+
+        return hPos + ' / ' + vPos;
+    };
+
+    PTZTrackerWidget.prototype.sendPTZCommand = function(command) {
+        if (!this._ptzSettings.cameraIP) return;
+
+        var endpoint = '';
+        var speed = this._ptzSettings.panSpeed;
+
+        switch (command) {
+            case 'left':
+                endpoint = 'ptzcmd&left&' + speed + '&' + speed;
+                break;
+            case 'right':
+                endpoint = 'ptzcmd&right&' + speed + '&' + speed;
+                break;
+            case 'up':
+                endpoint = 'ptzcmd&up&' + speed + '&' + speed;
+                break;
+            case 'down':
+                endpoint = 'ptzcmd&down&' + speed + '&' + speed;
+                break;
+            case 'stop':
+            case 'centered':
+                endpoint = 'ptzcmd&ptzstop';
+                break;
+            default:
+                return;
+        }
+
+        var url = 'http://' + this._ptzSettings.cameraIP + '/cgi-bin/ptzctrl.cgi?' + endpoint;
+
+        fetch(url, { method: 'GET', mode: 'no-cors' }).catch(function(err) {
+            console.log('PTZ command sent (no-cors):', command);
+        });
+    };
+
+    PTZTrackerWidget.prototype.updateStatusOverlay = function(state, text) {
+        if (!this._statusOverlay) return;
+        var dot = this._statusOverlay.querySelector('.moon-ptz-status-dot');
+        var textEl = this._statusOverlay.querySelector('.moon-ptz-status-text');
+
+        this._statusOverlay.className = 'moon-ptz-status-overlay moon-ptz-status-' + state;
+        textEl.textContent = text;
+    };
+
+    PTZTrackerWidget.prototype.updateTrackingStatus = function(object, position, command) {
+        if (!this._statusSection) return;
+        this._statusSection.querySelector('.moon-ptz-object-status').textContent = object;
+        this._statusSection.querySelector('.moon-ptz-position-status').textContent = position;
+        this._statusSection.querySelector('.moon-ptz-command-status').textContent = command;
+    };
+
+    PTZTrackerWidget.prototype.updateFPSDisplay = function() {
+        if (!this._statusSection) return;
+        this._statusSection.querySelector('.moon-ptz-fps-status').textContent = this._detectionCount || 0;
+    };
+
+    PTZTrackerWidget.prototype.unmount = function() {
+        this.stopTracking();
+        WidgetBase.prototype.unmount.call(this);
+    };
+
+    // ============================================================
     // WIDGET REGISTRY
     // ============================================================
     var WidgetRegistry = {
@@ -3135,7 +3742,8 @@
         'scene-analyzer': SceneAnalyzerWidget,
         'person-tracker': PersonTrackerWidget,
         'zone-monitor': ZoneMonitorWidget,
-        'production-monitor': ProductionMonitorWidget
+        'production-monitor': ProductionMonitorWidget,
+        'ptz-tracker': PTZTrackerWidget
     };
 
     var WidgetList = [
@@ -3144,7 +3752,8 @@
         { id: 'scene-analyzer', label: 'Scene Analyzer', icon: '🎬', desc: 'Get AI captions and ask questions about what you see' },
         { id: 'person-tracker', label: 'Person Tracker', icon: '👤', desc: 'Track and locate people with face or body detection' },
         { id: 'zone-monitor', label: 'Zone Monitor', icon: '🚧', desc: 'Draw zones and get alerts when objects enter them' },
-        { id: 'production-monitor', label: 'Production Monitor', icon: '🎥', desc: 'Real-time video quality monitoring dashboard' }
+        { id: 'production-monitor', label: 'Production Monitor', icon: '🎥', desc: 'Real-time video quality monitoring dashboard' },
+        { id: 'ptz-tracker', label: 'PTZ Auto-Tracker', icon: '🎯', desc: 'AI-powered tracking that controls PTZ cameras automatically' }
     ];
 
     // Module info content from README for display in modals
@@ -3178,6 +3787,11 @@
             whatItDoes: 'A comprehensive video production quality dashboard that combines traditional computer vision with MoonDream\'s visual reasoning. It monitors 7 different aspects of your shot in real-time: Orientation, Talking, Focus, Lighting, Presence, Composition, and Scene Context.',
             whyUseful: 'This is the kind of automated quality control that broadcast engineers dream of. Instead of manually checking that a speaker is in frame, facing the camera, properly lit, and in focus—the AI monitors everything continuously and alerts you to problems.',
             tryThis: 'Start your webcam and click "Start Monitoring". Watch the status cards turn green (good), yellow (warning), or red (problem). Move around, look away from camera, or cover the lens to see how each monitor responds.'
+        },
+        'ptz-tracker': {
+            whatItDoes: 'Uses MoonDream AI to detect any object you specify, then automatically sends pan/tilt commands to your PTZ camera to keep that object centered in frame. Includes presets for different tracking styles from smooth broadcast movements to fast sports tracking.',
+            whyUseful: 'This is real PTZ automation—no operator needed. Perfect for solo presenters, houses of worship, classrooms, or any situation where you want the camera to follow a subject automatically. Works with PTZOptics and other HTTP-controlled PTZ cameras.',
+            tryThis: 'Start in Simulation Mode to see how it works without a PTZ camera. Enter "person" or "face" as target, start tracking, and watch the status display show what PTZ commands would be sent as you move around the frame.'
         }
     };
 
@@ -3435,7 +4049,7 @@
             '<p>' +
                 '<a href="https://docs.moondream.ai" target="_blank">MoonDream API Docs</a> · ' +
                 '<a href="https://ptzoptics.com" target="_blank">PTZOptics</a> · ' +
-                '<a href="https://github.com/matthewidavis/PTZOptics-Moondreams" target="_blank">GitHub</a>' +
+                '<a href="https://github.com/matthewidavis/PTZOpticsVRP" target="_blank">GitHub</a>' +
             '</p>';
         content.appendChild(links);
 

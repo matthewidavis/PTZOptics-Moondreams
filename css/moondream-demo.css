@@ -1187,6 +1187,7 @@
 .moon-file-input { display: none; }
 .moon-no-webcam { font-size: 12px; color: var(--moon-text-muted); padding: var(--moon-space-sm); }
 
+.moon-camera-select,
 .moon-resolution-select {
     padding: var(--moon-space-xs) var(--moon-space-sm);
     font-size: 13px;
@@ -1195,8 +1196,10 @@
     border-radius: var(--moon-radius);
     color: var(--moon-text);
     cursor: pointer;
+    max-width: 150px;
 }
 
+.moon-camera-select:disabled,
 .moon-resolution-select:disabled {
     opacity: 0.6;
     cursor: wait;
@@ -2552,4 +2555,178 @@
     .moon-btn { border-width: 2px; }
     .moon-tag { border-width: 2px; }
     .moon-shot-card, .moon-style-card { border-width: 2px; }
+}
+
+/* ============================================================
+   PTZ AUTO-TRACKER STYLES
+   ============================================================ */
+
+/* Checkbox styling */
+.moon-checkbox-group {
+    margin-top: var(--moon-space-sm);
+}
+
+.moon-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-sm);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--moon-text);
+}
+
+.moon-checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--moon-primary);
+}
+
+/* Slider styling */
+.moon-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: var(--moon-bg-tertiary);
+    border-radius: 4px;
+    outline: none;
+    border: 1px solid var(--moon-border);
+}
+
+.moon-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--moon-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background var(--moon-transition);
+}
+
+.moon-slider::-webkit-slider-thumb:hover {
+    background: var(--moon-primary-hover);
+}
+
+.moon-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--moon-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.moon-rate-value {
+    color: var(--moon-primary);
+    font-weight: 600;
+}
+
+/* PTZ Status Overlay */
+.moon-ptz-status-overlay {
+    display: flex;
+    align-items: center;
+    gap: var(--moon-space-sm);
+    padding: var(--moon-space-sm) var(--moon-space-md);
+    background: var(--moon-bg-secondary);
+    border: 1px solid var(--moon-border);
+    border-radius: var(--moon-radius);
+    margin-top: var(--moon-space-sm);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.moon-ptz-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--moon-text-muted);
+}
+
+.moon-ptz-status-ready .moon-ptz-status-dot {
+    background: var(--moon-text-muted);
+}
+
+.moon-ptz-status-tracking .moon-ptz-status-dot {
+    background: var(--moon-success);
+    animation: moonPtzPulse 1s ease infinite;
+}
+
+@keyframes moonPtzPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+.moon-ptz-status-tracking {
+    background: var(--moon-success-bg);
+    border-color: var(--moon-success);
+    color: var(--moon-success);
+}
+
+/* PTZ Tracking Status Grid */
+.moon-ptz-status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--moon-space-sm);
+}
+
+.moon-ptz-stat {
+    background: var(--moon-bg-tertiary);
+    border-radius: var(--moon-radius);
+    padding: var(--moon-space-sm) var(--moon-space-md);
+    text-align: center;
+}
+
+.moon-ptz-stat-label {
+    font-size: 11px;
+    color: var(--moon-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--moon-space-xs);
+}
+
+.moon-ptz-stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--moon-text);
+}
+
+.moon-ptz-object-status {
+    color: var(--moon-success);
+}
+
+.moon-ptz-command-status {
+    color: var(--moon-primary);
+}
+
+/* PTZ Tracking Status section */
+.moon-ptz-tracking-status {
+    margin-top: var(--moon-space-md);
+}
+
+.moon-ptz-tracking-status .moon-section-title {
+    font-size: 13px;
+    margin-bottom: var(--moon-space-sm);
+}
+
+/* NDI Tip box */
+.moon-ptz-ndi-tip {
+    margin-top: var(--moon-space-sm);
+    padding: var(--moon-space-sm) var(--moon-space-md);
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: var(--moon-radius);
+    font-size: 12px;
+    color: var(--moon-text-muted);
+    line-height: 1.5;
+}
+
+.moon-ptz-ndi-tip a {
+    color: var(--moon-primary);
+    text-decoration: none;
+}
+
+.moon-ptz-ndi-tip a:hover {
+    text-decoration: underline;
 }
