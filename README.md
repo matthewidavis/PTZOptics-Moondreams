@@ -1,4 +1,4 @@
-# PTZOptics Moondreams
+# PTZOptics Visual Reasoning Playground
 
 **Visual Reasoning Demos for Video Production**
 
